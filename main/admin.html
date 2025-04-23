@@ -81,17 +81,19 @@
          getUsers();
          document.getElementById('downgrade').addEventListener('click', async function (e) {
             e.preventDefault();
-            const select = document.getElementById("userSelect").value;
-            const response = await fetch(`/admin-roles?username=${select}&action=downgrade`,{
-                method:"GET",
+            try{
 
-            })
-            const data = await response.json();
-            if(data.success){
-                getUsers();
-                alert("user has been downgrade")
-            }else{
-                alert("user is already a Noraml")
+                const select = document.getElementById("userSelect").value;
+                const response = await fetch(`/admin-roles?username=${select}&action=downgrade`,{
+                    method:"GET",
+                    
+                })
+                const data = await response.json();
+                if(data.success){
+                    getUsers();
+                }
+            }catch(e){
+                console.error("Error fetching users:", e);
             }
 
             
@@ -100,18 +102,20 @@
 
           document.getElementById('Upgrade').addEventListener('click', async function (e) {
             e.preventDefault();
+            try{
+
                 const select = document.getElementById("userSelect").value;
                 const response = await fetch(`/admin-roles?username=${select}&action=upgrade`, {
                     method: "GET",
                 });
-
+                
                 const data = await response.json();
                 if (data.success) {
                     getUsers();
-                    alert("User has been upgraded");
-                } else {
-                    alert("User is already an Admin");
-                }
+                } 
+            } catch (e) {
+                console.error("Error fetching users:", e);
+            }
             });
 
         

@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const fs = require("fs");
 
 const app = express();
+app.disable('etag');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
@@ -15,17 +16,19 @@ const usersFile = path.join(__dirname, "data.json");
 
 
     app.use(session({
+        name: "myapp_session",
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: {
             httpOnly: true, 
+            maxAge: 1000 * 60 * 60 * 1
         }
       
         
     }));
 
-function loadUsers() {
+function  loadUsers() {
     if (fs.existsSync(usersFile)) {
         const data = fs.readFileSync(usersFile);
         return JSON.parse(data);
@@ -33,8 +36,8 @@ function loadUsers() {
     return [];
 }
 let users = loadUsers();
-function saveUsers() {
-     fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
+ function saveUsers()  {
+    fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
       
 }
 
@@ -50,8 +53,8 @@ app.post("/1_ver",(req,res)=>{
     res.status(410).json({ success: false, message: "Invalid credentials" })
 
 });
-app.get("/ReqData",(req,res)=>{
-    users = loadUsers();
+app.get("/ReqData",async (req,res)=>{
+    users = await loadUsers();
     const user = users.find(u => u.username === req.session.user);
     if(user){
         res.json({success:true,username:user.username , role: user.role });
@@ -61,8 +64,8 @@ app.get("/ReqData",(req,res)=>{
 
 });
 
-app.get("/ReqUsers", (req, res) => {
-    users = loadUsers();
+app.get("/ReqUsers", async (req, res) => {
+    users = await loadUsers();
     res.json({ users });
 
 });
@@ -70,30 +73,32 @@ app.get("/admin-roles",async (req, res) => {
     users = loadUsers();
     const referer = req.get("Referer");
     const {username ,action} = req.query
+    const admin = users.find(u => u.username === req.session.user);
     const user = users.find(u => u.username===username);
-    if (!referer && !referer.startsWith("http://localhost:3000/adminpanel")){
-        return res.status(403).json({ success: false, message: "Access denied. Invalid referer." });
-
+    if (!referer || !referer.startsWith("http://localhost:3000/adminpanel")){
+        return res.status(403).json({ success: false, message: "Unauthorized" });
     }
     if(!user){
         return res.status(404).json({ success: false, message: "User not found" });
     }
+    if(!admin) {
+        return res.status(404).json({ success: false, message: "Unauthorized" });
+    }
+    
 
         console.log(user.role)
     if (user.role === "Normal" && action === "upgrade") {
             user.role = "Admin"
-            saveUsers()
+             saveUsers()
         return res.json({ success: true, message: "upgrade done" })
     
-        } 
-         if ( user.role === "Admin" && action === "downgrade"){
+        }else if (user.role === "Admin" && action === "downgrade"){
             user.role = "Normal"
-             saveUsers()
-            return res.json({ success: true, message: "Downgrade done"})
-                
+            saveUsers()
+            return res.json({ success: true, message: "Downgrade done"})     
         }
             
-            return res.json({ success: false, message: "User already has that role" });
+            return res.json({ success: false, message: "User already has that role" });  
       
     
     

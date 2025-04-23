@@ -12,6 +12,6 @@
   {
     "username": "user2",
     "password": "password2",
-    "role": "Normal"
+    "role": "Admin"
   }
 ]
