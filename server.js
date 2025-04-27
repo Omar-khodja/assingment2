@@ -81,7 +81,7 @@ app.get("/admin-roles",async (req, res) => {
     if(!user){
         return res.status(404).json({ success: false, message: "User not found" });
     }
-    if(!admin) {
+    if(!admin ) {
         return res.status(404).json({ success: false, message: "Unauthorized" });
     }
     

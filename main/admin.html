@@ -79,19 +79,17 @@
         }
 
          getUsers();
-         document.getElementById('downgrade').addEventListener('click', async function (e) {
-            e.preventDefault();
+         document.getElementById('downgrade').addEventListener('click', async function () {
+            
             try{
 
                 const select = document.getElementById("userSelect").value;
                 const response = await fetch(`/admin-roles?username=${select}&action=downgrade`,{
                     method:"GET",
                     
+                    
                 })
                 const data = await response.json();
-                if(data.success){
-                    getUsers();
-                }
             }catch(e){
                 console.error("Error fetching users:", e);
             }
@@ -100,8 +98,8 @@
               
             });
 
-          document.getElementById('Upgrade').addEventListener('click', async function (e) {
-            e.preventDefault();
+          document.getElementById('Upgrade').addEventListener('click', async function () {
+            
             try{
 
                 const select = document.getElementById("userSelect").value;
@@ -110,9 +108,7 @@
                 });
                 
                 const data = await response.json();
-                if (data.success) {
-                    getUsers();
-                } 
+                
             } catch (e) {
                 console.error("Error fetching users:", e);
             }

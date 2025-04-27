@@ -2,12 +2,12 @@
   {
     "username": "admin",
     "password": "123",
-    "role": "Admin"
+    "role": "Normal"
   },
   {
     "username": "user1",
     "password": "pwd1",
-    "role": "Normal"
+    "role": "Admin"
   },
   {
     "username": "user2",
